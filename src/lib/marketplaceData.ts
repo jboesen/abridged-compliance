@@ -11,6 +11,20 @@ export const workflowTypes = [
     reviews: 24,
     price: 299,
     verified: true,
+    benefits: [
+      "Reduces permit approval time by 60%",
+      "Auto-fills all required LA County forms",
+      "Includes pre-approved traffic control plans",
+      "Automated document validation",
+      "Direct submission to LA County Public Works"
+    ],
+    useCases: [
+      "Utility line installations",
+      "Telecommunications infrastructure",
+      "Water line repairs",
+      "Gas line installations",
+      "Underground electrical work"
+    ]
   },
   {
     id: "la-traffic-control",
@@ -22,6 +36,20 @@ export const workflowTypes = [
     reviews: 18,
     price: 249,
     verified: true,
+    benefits: [
+      "Pre-approved traffic control plan templates",
+      "Automated lane closure scheduling",
+      "Real-time agency requirement updates",
+      "Notification system for affected residents",
+      "Expedited review process"
+    ],
+    useCases: [
+      "Road construction projects",
+      "Utility work in high-traffic areas",
+      "Special event road closures",
+      "Emergency repair work",
+      "Construction site access planning"
+    ]
   },
   {
     id: "la-sidewalk",
@@ -33,6 +61,20 @@ export const workflowTypes = [
     reviews: 12,
     price: 199,
     verified: true,
+    benefits: [
+      "ADA compliance verification",
+      "Automated dimension calculations",
+      "Material specification templates",
+      "Pedestrian safety plan generation",
+      "Integration with LA County inspection scheduling"
+    ],
+    useCases: [
+      "New sidewalk installations",
+      "Sidewalk repair projects",
+      "Curb and gutter installations",
+      "ADA ramp construction",
+      "Public walkway improvements"
+    ]
   },
   {
     id: "la-road-repair",
@@ -44,6 +86,20 @@ export const workflowTypes = [
     reviews: 15,
     price: 279,
     verified: false,
+    benefits: [
+      "Automated pavement assessment forms",
+      "Material quantity calculations",
+      "Traffic impact analysis automation",
+      "Right-of-way documentation templates",
+      "Inspection scheduling integration"
+    ],
+    useCases: [
+      "Pothole repairs",
+      "Full road resurfacing",
+      "Road widening projects",
+      "Median construction",
+      "Shoulder repair and maintenance"
+    ]
   },
   {
     id: "la-storm-drain",
@@ -55,5 +111,19 @@ export const workflowTypes = [
     reviews: 9,
     price: 229,
     verified: false,
+    benefits: [
+      "Hydraulic calculation templates",
+      "Environmental compliance automation",
+      "Material specification guides",
+      "Integration with LA County Flood Control District systems",
+      "Maintenance schedule generation"
+    ],
+    useCases: [
+      "New storm drain installations",
+      "Drainage system upgrades",
+      "Flood control projects",
+      "Culvert installations",
+      "Stormwater management compliance"
+    ]
   },
 ];
