@@ -1,31 +1,9 @@
 
-export const permitTopics = [
-  {
-    label: "Building Permits",
-    value: "building",
-  },
-  {
-    label: "Zoning Regulations",
-    value: "zoning",
-  },
-  {
-    label: "Inspections",
-    value: "inspections",
-  },
-  {
-    label: "Timeline Estimates",
-    value: "timeline",
-  },
-  {
-    label: "Required Documents",
-    value: "documents",
-  },
-];
-
+// Sample queries for the chat interface
 export const sampleQueries = [
-  "What permits do I need for a kitchen renovation?",
-  "How long does it take to get a building permit approved?",
-  "What are the zoning restrictions in my area?",
-  "I received comments on my permit application. Can you help me address them?",
-  "What documents do I need to submit for a commercial building permit?",
+  "What permits do I need for my utility trenching project in LA County?",
+  "What are the traffic control requirements for construction in LA?",
+  "How long does the LA County permit approval process typically take?",
+  "Do I need a special permit for sidewalk construction in Los Angeles?",
+  "What documents are required for a road repair permit in LA County?",
 ];

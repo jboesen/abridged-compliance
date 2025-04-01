@@ -1,134 +1,59 @@
 
-export type WorkflowType = {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  benefits: string[];
-  useCases: string[];
-  popularity: number; // 1-100 scale
-  price: number; // Price in USD
-};
-
-export const workflowTypes: WorkflowType[] = [
+// Workflow types for the marketplace
+export const workflowTypes = [
   {
-    id: "utility-trenching-sanjose",
-    title: "Utility Trenching Permits - San Jose",
-    description: "Streamline the complex process of obtaining trenching permits in San Jose with this specialized workflow for utility contractors and civil engineers.",
-    icon: "map",
-    benefits: [
-      "Auto-populated forms with project specifications",
-      "Pre-configured compliance checks for San Jose regulations",
-      "Automated traffic control plan generation",
-      "Integrated notification system for utility marking requirements"
-    ],
-    useCases: [
-      "Fiber optic cable installation",
-      "Water line repairs and upgrades",
-      "Electrical conduit installation",
-      "Gas line maintenance projects"
-    ],
-    popularity: 95,
-    price: 249
+    id: "la-utility-trenching",
+    title: "LA County Utility Trenching Permit Workflow",
+    description: "Complete workflow for utility trenching permits in Los Angeles County.",
+    agency: "LA County Public Works",
+    permitType: "utility",
+    rating: 4.8,
+    reviews: 24,
+    price: 299,
+    verified: true,
   },
   {
-    id: "road-repair-oakland",
-    title: "Road Repair & ROW Permits - Oakland",
-    description: "Comprehensive workflow for road repair and right-of-way permits in Oakland, optimized for civil engineering firms and contractors.",
-    icon: "building",
-    benefits: [
-      "Built-in compliance with Oakland-specific regulations",
-      "Automated encroachment permit application process",
-      "Integrated fee calculator based on project parameters",
-      "Pre-approved traffic diversion templates"
-    ],
-    useCases: [
-      "Pothole and pavement repairs",
-      "Sidewalk replacement projects",
-      "Curb and gutter modifications",
-      "ADA ramp installations"
-    ],
-    popularity: 87,
-    price: 199
+    id: "la-traffic-control",
+    title: "LA County Traffic Control Plan Package",
+    description: "Traffic control plan templates and automated permit generation for LA County.",
+    agency: "LA Department of Transportation",
+    permitType: "traffic",
+    rating: 4.6,
+    reviews: 18,
+    price: 249,
+    verified: true,
   },
   {
-    id: "sidewalk-improvement-sf",
-    title: "Sidewalk Improvement Workflow - San Francisco",
-    description: "Navigate San Francisco's complex sidewalk permitting process with this specialized workflow designed for civil engineers and contractors.",
-    icon: "building",
-    benefits: [
-      "SF-specific compliance verification",
-      "Automated notification to adjacent property owners",
-      "Integration with DPW notification requirements",
-      "Pre-formatted accessibility compliance documentation"
-    ],
-    useCases: [
-      "Commercial frontage improvements",
-      "Residential sidewalk repairs",
-      "Tree well installations and modifications",
-      "ADA compliance upgrades"
-    ],
-    popularity: 82,
-    price: 279
+    id: "la-sidewalk",
+    title: "LA County Sidewalk Construction Workflow",
+    description: "Step-by-step workflow for sidewalk construction permits in LA County.",
+    agency: "LA County Public Works",
+    permitType: "sidewalk",
+    rating: 4.5,
+    reviews: 12,
+    price: 199,
+    verified: true,
   },
   {
-    id: "stormwater-compliance",
-    title: "Stormwater Compliance Package - Bay Area",
-    description: "Comprehensive workflow for managing stormwater permits and compliance across Bay Area jurisdictions.",
-    icon: "zap",
-    benefits: [
-      "Multi-jurisdiction compatibility (9 Bay Area counties)",
-      "Automated BMP selection based on project parameters",
-      "Pre-formatted SWPPP documentation",
-      "Integrated reporting templates for inspections"
-    ],
-    useCases: [
-      "Construction site runoff control",
-      "Post-construction stormwater management",
-      "Municipal storm drain connections",
-      "Erosion control planning"
-    ],
-    popularity: 89,
-    price: 349
+    id: "la-road-repair",
+    title: "LA County Road Repair & ROW Permits",
+    description: "Comprehensive workflow for road repair and right-of-way permits in LA County.",
+    agency: "LA County Public Works",
+    permitType: "road",
+    rating: 4.7,
+    reviews: 15,
+    price: 279,
+    verified: false,
   },
   {
-    id: "utility-coordination",
-    title: "Utility Coordination Workflow",
-    description: "Streamline multi-utility notifications and permit applications for complex infrastructure projects.",
-    icon: "plug",
-    benefits: [
-      "Automated 811 notification integration",
-      "Conflict identification with existing utilities",
-      "Coordination timeline management",
-      "Joint trench application templates"
-    ],
-    useCases: [
-      "Multi-utility installation projects",
-      "Joint trench coordination",
-      "Conflict resolution with existing infrastructure",
-      "Emergency repair coordination"
-    ],
-    popularity: 76,
-    price: 229
+    id: "la-storm-drain",
+    title: "LA County Storm Drain Installation Package",
+    description: "Complete permit workflow for storm drain installations in LA County.",
+    agency: "LA County Flood Control District",
+    permitType: "utility",
+    rating: 4.4,
+    reviews: 9,
+    price: 229,
+    verified: false,
   },
-  {
-    id: "environmental-compliance",
-    title: "Environmental Compliance Package",
-    description: "Ensure environmental compliance for civil engineering projects with this specialized permit workflow.",
-    icon: "leaf",
-    benefits: [
-      "CEQA compliance documentation generator",
-      "Automated environmental impact assessments",
-      "Habitat conservation notification integration",
-      "Air quality compliance management"
-    ],
-    useCases: [
-      "Projects near sensitive habitats",
-      "Work in waterway buffer zones",
-      "Projects with significant excavation",
-      "Construction in air quality management districts"
-    ],
-    popularity: 81,
-    price: 399
-  }
 ];
