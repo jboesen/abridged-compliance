@@ -19,9 +19,9 @@ const Marketplace = () => {
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 pt-24 pb-16">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Permit Workflow Marketplace</h1>
+        <h1 className="text-3xl font-bold text-slate-900 mb-2">Civil Engineering Permit Workflow Marketplace</h1>
         <p className="text-lg text-slate-600 mb-8">
-          Discover specialized permitting workflows tailored to your project needs
+          Specialized permit workflows created by experts for civil engineers and contractors
         </p>
         
         <div className="flex gap-4 mb-8">
@@ -148,7 +148,12 @@ const WorkflowCard = ({ workflow }: { workflow: WorkflowType }) => {
           ))}
         </ul>
         
-        <Button className="w-full" variant="outline" asChild>
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-xl font-bold text-indigo-600">${workflow.price}</span>
+          <span className="text-sm text-gray-500">One-time purchase</span>
+        </div>
+        
+        <Button className="w-full" variant="default" asChild>
           <Link to={`/workflow/${workflow.id}`}>View Workflow</Link>
         </Button>
       </CardContent>

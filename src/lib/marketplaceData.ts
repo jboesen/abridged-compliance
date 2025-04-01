@@ -7,121 +7,128 @@ export type WorkflowType = {
   benefits: string[];
   useCases: string[];
   popularity: number; // 1-100 scale
+  price: number; // Price in USD
 };
 
 export const workflowTypes: WorkflowType[] = [
   {
-    id: "residential-renovation",
-    title: "Residential Renovation Permits",
-    description: "Streamline permits for home renovations, additions, and remodels with AI-guided document preparation and local code compliance.",
-    icon: "home",
-    benefits: [
-      "Pre-filled forms based on project type and location",
-      "Automatic checks against local residential codes",
-      "Timeline estimates based on similar projects",
-      "Common rejection reasons and how to avoid them"
-    ],
-    useCases: [
-      "Kitchen and bathroom remodels",
-      "Home additions",
-      "Basement finishing",
-      "Structural modifications"
-    ],
-    popularity: 92
-  },
-  {
-    id: "commercial-construction",
-    title: "Commercial Construction Permits",
-    description: "Navigate complex commercial permitting requirements with specialized workflows for new construction, tenant improvements, and change of use.",
-    icon: "building",
-    benefits: [
-      "Multi-department permit coordination",
-      "Accessibility compliance verification",
-      "Fire safety requirement checks",
-      "Zoning and land use validation"
-    ],
-    useCases: [
-      "New commercial buildings",
-      "Tenant improvements",
-      "Change of occupancy",
-      "Mixed-use developments"
-    ],
-    popularity: 85
-  },
-  {
-    id: "specialty-permits",
-    title: "Specialty Trade Permits",
-    description: "Focused workflows for electrical, plumbing, mechanical, and other specialty permits with technical requirement guidance.",
-    icon: "plug",
-    benefits: [
-      "Trade-specific code requirement checks",
-      "Required inspection scheduling assistance",
-      "Technical drawing review guidelines",
-      "License and insurance verification"
-    ],
-    useCases: [
-      "Electrical system upgrades",
-      "HVAC installations",
-      "Plumbing modifications",
-      "Fire protection systems"
-    ],
-    popularity: 78
-  },
-  {
-    id: "expedited-review",
-    title: "Expedited Review Process",
-    description: "Fast-track permit approval with optimized application packages and pre-submission reviews to minimize revision cycles.",
-    icon: "zap",
-    benefits: [
-      "Pre-submission application review",
-      "Common error identification and correction",
-      "Priority processing strategies",
-      "Jurisdiction-specific expediting tips"
-    ],
-    useCases: [
-      "Time-sensitive projects",
-      "Simple projects with standard requirements",
-      "Emergency repairs and replacements",
-      "Projects with financing deadlines"
-    ],
-    popularity: 89
-  },
-  {
-    id: "zoning-compliance",
-    title: "Zoning & Land Use Compliance",
-    description: "Analyze zoning requirements, setbacks, and land use restrictions before submitting permits to prevent costly revisions.",
+    id: "utility-trenching-sanjose",
+    title: "Utility Trenching Permits - San Jose",
+    description: "Streamline the complex process of obtaining trenching permits in San Jose with this specialized workflow for utility contractors and civil engineers.",
     icon: "map",
     benefits: [
-      "Automatic zoning district identification",
-      "Setback and height restriction analysis",
-      "Conditional use and variance guidance",
-      "Historical district compliance checks"
+      "Auto-populated forms with project specifications",
+      "Pre-configured compliance checks for San Jose regulations",
+      "Automated traffic control plan generation",
+      "Integrated notification system for utility marking requirements"
     ],
     useCases: [
-      "New construction siting",
-      "Property subdivision",
-      "Accessory dwelling units",
-      "Mixed-use developments"
+      "Fiber optic cable installation",
+      "Water line repairs and upgrades",
+      "Electrical conduit installation",
+      "Gas line maintenance projects"
     ],
-    popularity: 76
+    popularity: 95,
+    price: 249
   },
   {
-    id: "sustainable-building",
-    title: "Green Building & Energy Permits",
-    description: "Streamline permits for sustainable building projects with specialized workflows for energy efficiency, renewables, and green certifications.",
-    icon: "leaf",
+    id: "road-repair-oakland",
+    title: "Road Repair & ROW Permits - Oakland",
+    description: "Comprehensive workflow for road repair and right-of-way permits in Oakland, optimized for civil engineering firms and contractors.",
+    icon: "building",
     benefits: [
-      "Energy code compliance verification",
-      "Solar and renewable system permitting",
-      "Green building certification guidance",
-      "Incentive program application support"
+      "Built-in compliance with Oakland-specific regulations",
+      "Automated encroachment permit application process",
+      "Integrated fee calculator based on project parameters",
+      "Pre-approved traffic diversion templates"
     ],
     useCases: [
-      "Solar panel installations",
-      "Energy efficiency retrofits",
-      "LEED certification projects",
-      "Net-zero energy buildings"
+      "Pothole and pavement repairs",
+      "Sidewalk replacement projects",
+      "Curb and gutter modifications",
+      "ADA ramp installations"
     ],
-    popularity: 81
+    popularity: 87,
+    price: 199
+  },
+  {
+    id: "sidewalk-improvement-sf",
+    title: "Sidewalk Improvement Workflow - San Francisco",
+    description: "Navigate San Francisco's complex sidewalk permitting process with this specialized workflow designed for civil engineers and contractors.",
+    icon: "building",
+    benefits: [
+      "SF-specific compliance verification",
+      "Automated notification to adjacent property owners",
+      "Integration with DPW notification requirements",
+      "Pre-formatted accessibility compliance documentation"
+    ],
+    useCases: [
+      "Commercial frontage improvements",
+      "Residential sidewalk repairs",
+      "Tree well installations and modifications",
+      "ADA compliance upgrades"
+    ],
+    popularity: 82,
+    price: 279
+  },
+  {
+    id: "stormwater-compliance",
+    title: "Stormwater Compliance Package - Bay Area",
+    description: "Comprehensive workflow for managing stormwater permits and compliance across Bay Area jurisdictions.",
+    icon: "zap",
+    benefits: [
+      "Multi-jurisdiction compatibility (9 Bay Area counties)",
+      "Automated BMP selection based on project parameters",
+      "Pre-formatted SWPPP documentation",
+      "Integrated reporting templates for inspections"
+    ],
+    useCases: [
+      "Construction site runoff control",
+      "Post-construction stormwater management",
+      "Municipal storm drain connections",
+      "Erosion control planning"
+    ],
+    popularity: 89,
+    price: 349
+  },
+  {
+    id: "utility-coordination",
+    title: "Utility Coordination Workflow",
+    description: "Streamline multi-utility notifications and permit applications for complex infrastructure projects.",
+    icon: "plug",
+    benefits: [
+      "Automated 811 notification integration",
+      "Conflict identification with existing utilities",
+      "Coordination timeline management",
+      "Joint trench application templates"
+    ],
+    useCases: [
+      "Multi-utility installation projects",
+      "Joint trench coordination",
+      "Conflict resolution with existing infrastructure",
+      "Emergency repair coordination"
+    ],
+    popularity: 76,
+    price: 229
+  },
+  {
+    id: "environmental-compliance",
+    title: "Environmental Compliance Package",
+    description: "Ensure environmental compliance for civil engineering projects with this specialized permit workflow.",
+    icon: "leaf",
+    benefits: [
+      "CEQA compliance documentation generator",
+      "Automated environmental impact assessments",
+      "Habitat conservation notification integration",
+      "Air quality compliance management"
+    ],
+    useCases: [
+      "Projects near sensitive habitats",
+      "Work in waterway buffer zones",
+      "Projects with significant excavation",
+      "Construction in air quality management districts"
+    ],
+    popularity: 81,
+    price: 399
   }
 ];

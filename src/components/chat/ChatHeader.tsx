@@ -15,7 +15,7 @@ const ChatHeader = () => {
         </svg>
       </div>
       <div>
-        <h2 className="font-semibold">Mio - Permio's AI Assistant</h2>
+        <h2 className="font-semibold">Mio - Permio's Civil Engineering Assistant</h2>
         <p className="text-xs text-white/70">Construction Permit Expert</p>
       </div>
       <div className="ml-auto flex gap-2">
@@ -27,7 +27,7 @@ const ChatHeader = () => {
             <path d="M2 7h20"></path>
             <path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"></path>
           </svg>
-          <span className="hidden md:inline ml-1">Marketplace</span>
+          <span className="hidden md:inline ml-1">Permit Workflows</span>
         </Link>
         <button className="p-2 hover:bg-white/10 rounded-full" title="Help">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
