@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { Database } from '@/integrations/supabase/types';
+import { toast } from '@/hooks/use-toast';
 
 // Define types for the tables we're working with
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
@@ -31,6 +32,11 @@ export function useSupabaseData() {
       return data as ProfileRow;
     } catch (error) {
       console.error('Error fetching profile:', error);
+      toast({
+        title: "Error fetching profile",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
+      });
       return null;
     } finally {
       setLoading(false);
@@ -53,6 +59,13 @@ export function useSupabaseData() {
       return data as CreatorRow;
     } catch (error) {
       console.error('Error fetching creator profile:', error);
+      if (error instanceof Error && error.message !== 'No rows found') {
+        toast({
+          title: "Error fetching creator profile",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
       return null;
     } finally {
       setLoading(false);
@@ -77,9 +90,20 @@ export function useSupabaseData() {
         .single();
         
       if (error) throw error;
+      
+      toast({
+        title: "Creator profile created",
+        description: "You are now registered as a creator",
+      });
+      
       return data as CreatorRow;
     } catch (error) {
       console.error('Error registering as creator:', error);
+      toast({
+        title: "Registration failed",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
+      });
       throw error;
     } finally {
       setLoading(false);
@@ -101,9 +125,14 @@ export function useSupabaseData() {
         .eq('user_id', user.id);
         
       if (error) throw error;
-      return data as (UserPurchaseRow & { workflow: WorkflowRow })[];
+      return data as unknown as (UserPurchaseRow & { workflow: WorkflowRow })[];
     } catch (error) {
       console.error('Error fetching purchased workflows:', error);
+      toast({
+        title: "Error fetching purchased workflows",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
+      });
       return [];
     } finally {
       setLoading(false);
@@ -126,9 +155,14 @@ export function useSupabaseData() {
         .order('updated_at', { ascending: false });
         
       if (error) throw error;
-      return data as (ChatRow & { workflow: WorkflowRow })[];
+      return data as unknown as (ChatRow & { workflow: WorkflowRow })[];
     } catch (error) {
       console.error('Error fetching user projects:', error);
+      toast({
+        title: "Error fetching projects",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
+      });
       return [];
     } finally {
       setLoading(false);
@@ -152,9 +186,20 @@ export function useSupabaseData() {
         .single();
         
       if (error) throw error;
+      
+      toast({
+        title: "Project created",
+        description: "Your new project has been created successfully",
+      });
+      
       return data as ChatRow;
     } catch (error) {
       console.error('Error creating project:', error);
+      toast({
+        title: "Error creating project",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
+      });
       throw error;
     } finally {
       setLoading(false);
