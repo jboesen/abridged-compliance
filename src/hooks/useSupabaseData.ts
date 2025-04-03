@@ -18,17 +18,51 @@ export function useSupabaseData() {
 
   // Fetch user profile data
   const fetchProfile = async (): Promise<ProfileRow | null> => {
-    if (!user) return null;
+    if (!user) {
+      console.log('No user found, cannot fetch profile');
+      return null;
+    }
     
     setLoading(true);
     try {
+      console.log('Fetching profile for user ID:', user.id);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
         
-      if (error) throw error;
+      if (error) {
+        console.error('Error in fetchProfile query:', error);
+        
+        // Check if the error is because the profile doesn't exist
+        if (error.code === 'PGRST116') {
+          console.log('Profile not found, creating a new profile');
+          
+          // If profile doesn't exist, create one
+          const { data: newProfile, error: createError } = await supabase
+            .from('profiles')
+            .insert({
+              id: user.id,
+              first_name: null,
+              last_name: null
+            })
+            .select()
+            .single();
+            
+          if (createError) {
+            console.error('Error creating profile:', createError);
+            throw createError;
+          }
+          
+          return newProfile as ProfileRow;
+        }
+        
+        throw error;
+      }
+      
+      console.log('Profile fetched successfully:', data);
       return data as ProfileRow;
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -45,17 +79,27 @@ export function useSupabaseData() {
 
   // Check if user is a creator
   const fetchCreatorProfile = async (): Promise<CreatorRow | null> => {
-    if (!user) return null;
+    if (!user) {
+      console.log('No user found, cannot fetch creator profile');
+      return null;
+    }
     
     setLoading(true);
     try {
+      console.log('Fetching creator profile for user ID:', user.id);
+      
       const { data, error } = await supabase
         .from('creators')
         .select('*')
         .eq('id', user.id)
         .single();
         
-      if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "not found" error
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching creator profile:', error);
+        throw error;
+      }
+      
+      console.log('Creator profile fetched:', data);
       return data as CreatorRow;
     } catch (error) {
       console.error('Error fetching creator profile:', error);

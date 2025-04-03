@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { TabsContent, Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,6 +20,15 @@ type PricingPlan = {
 const PaymentsPage = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Check if user is authenticated when component mounts
+    if (!user) {
+      console.log("No user found on PaymentsPage");
+    } else {
+      console.log("User found on PaymentsPage:", user.id);
+    }
+  }, [user]);
 
   const monthlyPlans: PricingPlan[] = [
     {
@@ -82,17 +90,24 @@ const PaymentsPage = () => {
     setIsLoading(plan.id);
     
     try {
+      console.log("Starting checkout for plan:", plan.id);
       // Call Stripe checkout edge function
       const { data, error } = await supabase.functions.invoke("create-checkout", {
         body: { planId: plan.id }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error from create-checkout function:", error);
+        throw error;
+      }
+      
+      console.log("Checkout response:", data);
       
       // Redirect to Stripe checkout
       if (data?.url) {
         window.location.href = data.url;
       } else {
+        console.error("No checkout URL returned");
         throw new Error("No checkout URL returned");
       }
     } catch (error) {

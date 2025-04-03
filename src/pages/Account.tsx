@@ -14,7 +14,6 @@ import { supabase } from "@/integrations/supabase/client";
 const Account = () => {
   const { user } = useAuth();
   const { fetchProfile } = useSupabaseData();
-  const navigate = useNavigate();
   
   const [isLoading, setIsLoading] = useState(false);
   const [profile, setProfile] = useState<{
@@ -30,15 +29,25 @@ const Account = () => {
   
   useEffect(() => {
     const loadProfile = async () => {
+      if (!user) {
+        console.log("No user found, cannot load profile");
+        return;
+      }
+      
       setIsLoading(true);
       try {
+        console.log("Loading profile for user ID:", user.id);
         const profileData = await fetchProfile();
+        
         if (profileData) {
+          console.log("Profile loaded successfully:", profileData);
           setProfile(profileData);
           setFormData({
             firstName: profileData.first_name || "",
             lastName: profileData.last_name || "",
           });
+        } else {
+          console.log("No profile data returned");
         }
       } catch (error) {
         console.error("Error loading profile:", error);
@@ -53,7 +62,7 @@ const Account = () => {
     };
     
     loadProfile();
-  }, [fetchProfile]);
+  }, [user, fetchProfile]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -65,9 +74,19 @@ const Account = () => {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please login to update your profile",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
+      console.log("Updating profile for user ID:", user.id);
       // Update profile using Supabase
       const { data, error } = await supabase
         .from('profiles')
@@ -75,16 +94,24 @@ const Account = () => {
           first_name: formData.firstName,
           last_name: formData.lastName,
         })
-        .eq('id', user?.id)
+        .eq('id', user.id)
         .select();
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error in update query:", error);
+        throw error;
+      }
       
-      setProfile(data[0]);
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been successfully updated",
-      });
+      if (data && data.length > 0) {
+        console.log("Profile updated successfully:", data[0]);
+        setProfile(data[0]);
+        toast({
+          title: "Profile updated",
+          description: "Your profile has been successfully updated",
+        });
+      } else {
+        console.log("No data returned from update");
+      }
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({
