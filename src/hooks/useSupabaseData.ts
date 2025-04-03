@@ -2,13 +2,21 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { Database } from '@/integrations/supabase/types';
+
+// Define types for the tables we're working with
+type ProfileRow = Database['public']['Tables']['profiles']['Row'];
+type CreatorRow = Database['public']['Tables']['creators']['Row'];
+type WorkflowRow = Database['public']['Tables']['workflows']['Row'];
+type ChatRow = Database['public']['Tables']['chats']['Row'];
+type UserPurchaseRow = Database['public']['Tables']['user_purchases']['Row'];
 
 export function useSupabaseData() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
 
   // Fetch user profile data
-  const fetchProfile = async () => {
+  const fetchProfile = async (): Promise<ProfileRow | null> => {
     if (!user) return null;
     
     setLoading(true);
@@ -20,7 +28,7 @@ export function useSupabaseData() {
         .single();
         
       if (error) throw error;
-      return data;
+      return data as ProfileRow;
     } catch (error) {
       console.error('Error fetching profile:', error);
       return null;
@@ -30,7 +38,7 @@ export function useSupabaseData() {
   };
 
   // Check if user is a creator
-  const fetchCreatorProfile = async () => {
+  const fetchCreatorProfile = async (): Promise<CreatorRow | null> => {
     if (!user) return null;
     
     setLoading(true);
@@ -42,7 +50,7 @@ export function useSupabaseData() {
         .single();
         
       if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "not found" error
-      return data;
+      return data as CreatorRow;
     } catch (error) {
       console.error('Error fetching creator profile:', error);
       return null;
@@ -52,7 +60,7 @@ export function useSupabaseData() {
   };
 
   // Register as creator
-  const registerAsCreator = async (companyName: string, description: string, website?: string) => {
+  const registerAsCreator = async (companyName: string, description: string, website?: string): Promise<CreatorRow | null> => {
     if (!user) throw new Error('Must be logged in');
     
     setLoading(true);
@@ -69,7 +77,7 @@ export function useSupabaseData() {
         .single();
         
       if (error) throw error;
-      return data;
+      return data as CreatorRow;
     } catch (error) {
       console.error('Error registering as creator:', error);
       throw error;
@@ -79,7 +87,7 @@ export function useSupabaseData() {
   };
 
   // Fetch user's purchased workflows
-  const fetchPurchasedWorkflows = async () => {
+  const fetchPurchasedWorkflows = async (): Promise<(UserPurchaseRow & { workflow: WorkflowRow })[]> => {
     if (!user) return [];
     
     setLoading(true);
@@ -93,7 +101,7 @@ export function useSupabaseData() {
         .eq('user_id', user.id);
         
       if (error) throw error;
-      return data;
+      return data as (UserPurchaseRow & { workflow: WorkflowRow })[];
     } catch (error) {
       console.error('Error fetching purchased workflows:', error);
       return [];
@@ -103,7 +111,7 @@ export function useSupabaseData() {
   };
 
   // Fetch user's projects (chats)
-  const fetchUserProjects = async () => {
+  const fetchUserProjects = async (): Promise<(ChatRow & { workflow: WorkflowRow })[]> => {
     if (!user) return [];
     
     setLoading(true);
@@ -118,7 +126,7 @@ export function useSupabaseData() {
         .order('updated_at', { ascending: false });
         
       if (error) throw error;
-      return data;
+      return data as (ChatRow & { workflow: WorkflowRow })[];
     } catch (error) {
       console.error('Error fetching user projects:', error);
       return [];
@@ -128,7 +136,7 @@ export function useSupabaseData() {
   };
 
   // Create a new project
-  const createProject = async (workflowId: string, projectName: string) => {
+  const createProject = async (workflowId: string, projectName: string): Promise<ChatRow | null> => {
     if (!user) throw new Error('Must be logged in');
     
     setLoading(true);
@@ -144,7 +152,7 @@ export function useSupabaseData() {
         .single();
         
       if (error) throw error;
-      return data;
+      return data as ChatRow;
     } catch (error) {
       console.error('Error creating project:', error);
       throw error;
