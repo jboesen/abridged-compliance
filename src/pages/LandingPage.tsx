@@ -1,10 +1,20 @@
-
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useAuth } from "@/context/AuthContext";
 
 const LandingPage = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+  
   return (
     <div className="min-h-screen bg-[#F2FCE2] text-[#221F26]">
       {/* Navigation */}
