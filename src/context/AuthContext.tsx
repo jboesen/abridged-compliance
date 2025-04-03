@@ -1,9 +1,11 @@
-
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
+
+// Configuration constant to toggle email verification requirement
+export const REQUIRE_EMAIL_VERIFICATION = false;
 
 interface AuthContextProps {
   session: Session | null;
@@ -80,7 +82,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       options: {
         data: metadata,
-        emailRedirectTo: `${window.location.origin}/auth/callback`
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        // Only apply email verification if the flag is turned on
+        ...(REQUIRE_EMAIL_VERIFICATION ? {} : { emailConfirm: false })
       }
     });
     
@@ -93,10 +97,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw error;
     }
     
-    toast({
-      title: "Account created",
-      description: "Please check your email to verify your account",
-    });
+    if (REQUIRE_EMAIL_VERIFICATION) {
+      toast({
+        title: "Account created",
+        description: "Please check your email to verify your account",
+      });
+      navigate('/verify');
+    } else {
+      toast({
+        title: "Account created",
+        description: "Your account has been created successfully",
+      });
+      // When verification is disabled, we don't redirect to verify page
+    }
   };
 
   const signOut = async () => {
