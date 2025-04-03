@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -19,6 +20,14 @@ const SignUp = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { signUp, user } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -44,9 +53,22 @@ const SignUp = () => {
     setIsLoading(true);
 
     try {
-      // In a real application, this would call a registration API
-      // For now, we'll simulate a successful registration
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Get first and last name from full name
+      const nameParts = formData.fullName.split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+      
+      await signUp(formData.email, formData.password, {
+        first_name: firstName,
+        last_name: lastName
+      });
+      
+      // Create company profile if applicable
+      if (formData.companyName && formData.companyType) {
+        // This would typically be done after confirming the email,
+        // but for demo purposes, we'll skip that step
+        // In a real app, move this to a follow-up step after email verification
+      }
       
       toast({
         title: "Account created",
@@ -55,9 +77,10 @@ const SignUp = () => {
       
       navigate("/verify");
     } catch (error) {
+      console.error("Signup error:", error);
       toast({
         title: "Registration failed",
-        description: "There was a problem creating your account.",
+        description: error instanceof Error ? error.message : "There was a problem creating your account.",
         variant: "destructive",
       });
     } finally {

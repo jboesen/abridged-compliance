@@ -6,24 +6,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { signIn, user } = useAuth();
+
+  // Redirect if already logged in
+  React.useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // In a real application, this would call an authentication API
-      // For now, we'll simulate a successful login
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Store some basic auth state
-      localStorage.setItem("isLoggedIn", "true");
+      await signIn(email, password);
       
       toast({
         title: "Login successful",
@@ -32,9 +36,10 @@ const Login = () => {
       
       navigate("/dashboard");
     } catch (error) {
+      console.error("Login error:", error);
       toast({
         title: "Login failed",
-        description: "Please check your credentials and try again.",
+        description: error instanceof Error ? error.message : "Please check your credentials and try again.",
         variant: "destructive",
       });
     } finally {
