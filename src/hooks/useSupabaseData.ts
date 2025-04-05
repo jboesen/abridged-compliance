@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 import { toast } from '@/hooks/use-toast';
@@ -37,7 +36,7 @@ export function useSupabaseData() {
   }, []);
 
   // Fetch user profile data
-  const fetchProfile = async (): Promise<ProfileRow | null> => {
+  const fetchProfile = useCallback(async (): Promise<ProfileRow | null> => {
     if (!currentUser) {
       console.log('No user found, cannot fetch profile');
       return null;
@@ -124,10 +123,10 @@ export function useSupabaseData() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser]);
 
   // Check if user is a creator
-  const fetchCreatorProfile = async (): Promise<CreatorRow | null> => {
+  const fetchCreatorProfile = useCallback(async (): Promise<CreatorRow | null> => {
     if (!currentUser) {
       console.log('No user found, cannot fetch creator profile');
       return null;
@@ -163,10 +162,10 @@ export function useSupabaseData() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser]);
 
   // Register as creator
-  const registerAsCreator = async (companyName: string, description: string, website?: string): Promise<CreatorRow | null> => {
+  const registerAsCreator = useCallback(async (companyName: string, description: string, website?: string): Promise<CreatorRow | null> => {
     if (!currentUser) throw new Error('Must be logged in');
     
     setLoading(true);
@@ -201,10 +200,10 @@ export function useSupabaseData() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser]);
 
   // Fetch user's purchased workflows
-  const fetchPurchasedWorkflows = async (): Promise<(UserPurchaseRow & { workflow: WorkflowRow })[]> => {
+  const fetchPurchasedWorkflows = useCallback(async (): Promise<(UserPurchaseRow & { workflow: WorkflowRow })[]> => {
     if (!currentUser) return [];
     
     setLoading(true);
@@ -230,10 +229,10 @@ export function useSupabaseData() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser]);
 
   // Fetch user's projects (chats)
-  const fetchUserProjects = async (): Promise<(ChatRow & { workflow: WorkflowRow })[]> => {
+  const fetchUserProjects = useCallback(async (): Promise<(ChatRow & { workflow: WorkflowRow })[]> => {
     if (!currentUser) return [];
     
     setLoading(true);
@@ -260,10 +259,10 @@ export function useSupabaseData() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser]);
 
   // Create a new project
-  const createProject = async (workflowId: string, projectName: string): Promise<ChatRow | null> => {
+  const createProject = useCallback(async (workflowId: string, projectName: string): Promise<ChatRow | null> => {
     if (!currentUser) throw new Error('Must be logged in');
     
     setLoading(true);
@@ -297,10 +296,10 @@ export function useSupabaseData() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser]);
 
   // Create a user profile explicitly
-  const createProfile = async (firstName?: string, lastName?: string): Promise<ProfileRow | null> => {
+  const createProfile = useCallback(async (firstName?: string, lastName?: string): Promise<ProfileRow | null> => {
     if (!currentUser) {
       console.log('No user found, cannot create profile');
       throw new Error('Must be logged in to create a profile');
@@ -343,10 +342,10 @@ export function useSupabaseData() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser]);
 
   // Helper function to ensure a user has a profile
-  const ensureUserProfile = async (): Promise<ProfileRow | null> => {
+  const ensureUserProfile = useCallback(async (): Promise<ProfileRow | null> => {
     if (!currentUser) return null;
     
     try {
@@ -371,7 +370,7 @@ export function useSupabaseData() {
       });
       return null;
     }
-  };
+  }, [currentUser]);
   
   return {
     loading,

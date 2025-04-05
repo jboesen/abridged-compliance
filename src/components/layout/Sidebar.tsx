@@ -35,7 +35,7 @@ const Sidebar = () => {
     if (user) {
       loadProfile();
     }
-  }, [user, fetchProfile]);
+  }, [user]); // Removed fetchProfile from dependencies
 
   const navItems = [
     {
