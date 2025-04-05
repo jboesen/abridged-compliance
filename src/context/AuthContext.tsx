@@ -1,11 +1,11 @@
-import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, useContext, ReactNode, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 
 // Configuration constant to toggle email verification requirement
-export const REQUIRE_EMAIL_VERIFICATION = false;
+export const REQUIRE_EMAIL_VERIFICATION = true;
 
 interface AuthContextProps {
   session: Session | null;
@@ -19,15 +19,21 @@ interface AuthContextProps {
 export const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  console.log('DEBUG: AuthProvider initialized');
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profileChecked, setProfileChecked] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log('DEBUG: AuthProvider useEffect running');
     // First set up auth state listener
+    console.log('DEBUG: Setting up auth state listener');
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state changed:", event);
+      console.log("DEBUG: Auth state changed:", event);
+      console.log("DEBUG: Session in auth change:", session ? 'Session exists' : 'No session');
+      console.log("DEBUG: User in session:", session?.user ? `User ID: ${session.user.id}` : 'No user');
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -52,10 +58,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     // Then check for existing session
+    console.log('DEBUG: Checking for existing session');
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Initial session check:", session ? "Found session" : "No session");
+      console.log("DEBUG: Initial session check:", session ? "Found session" : "No session");
+      console.log("DEBUG: Initial user:", session?.user ? `User ID: ${session.user.id}` : 'No user');
+      console.log("DEBUG: User metadata:", session?.user?.user_metadata ? JSON.stringify(session.user.user_metadata) : 'No metadata');
       setSession(session);
       setUser(session?.user ?? null);
+      console.log('DEBUG: Setting loading state to false');
+      setLoading(false);
+    }).catch(error => {
+      console.error('DEBUG: Error getting session:', error);
       setLoading(false);
     });
 
@@ -65,13 +78,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [navigate]);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      toast({
-        title: "Sign in failed",
-        description: error.message,
-        variant: "destructive",
-      });
+    console.log('DEBUG: signIn called with email:', email);
+    try {
+      console.log('DEBUG: Calling supabase.auth.signInWithPassword');
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      console.log('DEBUG: Sign in response received');
+      console.log('DEBUG: Sign in result - data:', data ? 'Data exists' : 'No data', 'error:', error ? `Error: ${error.message}` : 'No error');
+      console.log('DEBUG: User after sign in:', data?.user ? `User ID: ${data.user.id}` : 'No user');
+      
+      if (error) {
+        console.log('DEBUG: Sign in error:', error.message);
+        toast({
+          title: "Sign in failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        throw error;
+      }
+      
+      console.log('DEBUG: Sign in successful');
+    } catch (error) {
+      console.error('DEBUG: Unexpected error in signIn:', error);
       throw error;
     }
   };
@@ -126,6 +153,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw error;
     }
   };
+
+  console.log('DEBUG: Current auth state - session:', session ? 'Session exists' : 'No session');
+  console.log('DEBUG: Current auth state - user:', user ? `User ID: ${user.id}` : 'No user');
+  console.log('DEBUG: Current auth state - loading:', loading);
+  
+  // We removed the profile management from AuthContext to avoid circular dependencies
 
   const value = {
     session,

@@ -2,10 +2,65 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
+// Supabase connection configuration
 const SUPABASE_URL = "https://soqkdzjefmprswahhtsp.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvcWtkemplZm1wcnN3YWhodHNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM2OTEwMDgsImV4cCI6MjA1OTI2NzAwOH0.YP8QinSzQilv0jXUAZXcTKWqq7-jCp6VftC_fixL4TU";
+
+// Configure client options with proper error handling and timeouts
+const supabaseOptions = {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  },
+  global: {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    // Add custom fetch with timeout
+    fetch: (url: RequestInfo | URL, init?: RequestInit) => {
+      // Create a controller to set timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const customInit = {
+        ...init,
+        signal: controller.signal
+      };
+      
+      return fetch(url, customInit).finally(() => {
+        clearTimeout(timeoutId);
+      });
+    }
+  }
+};
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+// Create the client with options
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, supabaseOptions);
+
+// Add a connection health check function
+export const checkSupabaseConnection = async (): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('pg_settings')
+      .select('*')
+      .limit(1);
+
+    if (error) {
+      console.error('Supabase connection error:', {
+        code: error.code,
+        message: error.message,
+        details: error.details
+      });
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Critical connection failure:', error);
+    return false;
+  }
+};

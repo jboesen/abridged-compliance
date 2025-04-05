@@ -1,9 +1,9 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/context/AuthContext';
 import { Database } from '@/integrations/supabase/types';
 import { toast } from '@/hooks/use-toast';
+import { User } from '@supabase/supabase-js';
 
 // Define types for the tables we're working with
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
@@ -13,57 +13,75 @@ type ChatRow = Database['public']['Tables']['chats']['Row'];
 type UserPurchaseRow = Database['public']['Tables']['user_purchases']['Row'];
 
 export function useSupabaseData() {
-  const { user } = useAuth();
+  // Get the current user from Supabase directly instead of from AuthContext
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
+  
+  // Initialize the current user
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setCurrentUser(data.user);
+    };
+    
+    getCurrentUser();
+    
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setCurrentUser(session?.user ?? null);
+    });
+    
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   // Fetch user profile data
   const fetchProfile = async (): Promise<ProfileRow | null> => {
-    if (!user) {
+    if (!currentUser) {
       console.log('No user found, cannot fetch profile');
       return null;
     }
     
     setLoading(true);
+    
+    // Create a timeout promise to prevent infinite loading
+    const timeoutPromise = new Promise<null>((_, reject) => {
+      setTimeout(() => {
+        reject(new Error('Profile fetch timed out after 10 seconds'));
+      }, 10000);
+    });
+    
     try {
-      console.log('Fetching profile for user ID:', user.id);
+      console.log('Fetching profile for user ID:', currentUser.id);
       
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-        
-      if (error) {
-        console.error('Error in fetchProfile query:', error);
-        
-        // Check if the error is because the profile doesn't exist
-        if (error.code === 'PGRST116') {
-          console.log('Profile not found, creating a new profile');
+      // Race the fetch against the timeout
+      const profilePromise = (async () => {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', currentUser.id)
+          .single();
           
-          // If profile doesn't exist, create one
-          const { data: newProfile, error: createError } = await supabase
-            .from('profiles')
-            .insert({
-              id: user.id,
-              first_name: null,
-              last_name: null
-            })
-            .select()
-            .single();
-            
-          if (createError) {
-            console.error('Error creating profile:', createError);
-            throw createError;
+        if (error) {
+          console.error('Error in fetchProfile query:', error);
+          
+          // If profile doesn't exist, just report the error
+          if (error.code === 'PGRST116') {
+            console.log('Profile not found for user:', currentUser.id);
+            throw new Error('Profile not found. Please contact support.');
           }
           
-          return newProfile as ProfileRow;
+          throw error;
         }
         
-        throw error;
-      }
+        console.log('Profile fetched successfully:', data);
+        return data as ProfileRow;
+      })();
       
-      console.log('Profile fetched successfully:', data);
-      return data as ProfileRow;
+      // Race the profile fetch against the timeout
+      const result = await Promise.race([profilePromise, timeoutPromise]);
+      return result;
     } catch (error) {
       console.error('Error fetching profile:', error);
       toast({
@@ -71,6 +89,8 @@ export function useSupabaseData() {
         description: error instanceof Error ? error.message : "An unknown error occurred",
         variant: "destructive",
       });
+      
+      // Don't return a fallback profile - let the error propagate
       return null;
     } finally {
       setLoading(false);
@@ -79,19 +99,19 @@ export function useSupabaseData() {
 
   // Check if user is a creator
   const fetchCreatorProfile = async (): Promise<CreatorRow | null> => {
-    if (!user) {
+    if (!currentUser) {
       console.log('No user found, cannot fetch creator profile');
       return null;
     }
     
     setLoading(true);
     try {
-      console.log('Fetching creator profile for user ID:', user.id);
+      console.log('Fetching creator profile for user ID:', currentUser.id);
       
       const { data, error } = await supabase
         .from('creators')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', currentUser.id)
         .single();
         
       if (error && error.code !== 'PGRST116') {
@@ -118,14 +138,14 @@ export function useSupabaseData() {
 
   // Register as creator
   const registerAsCreator = async (companyName: string, description: string, website?: string): Promise<CreatorRow | null> => {
-    if (!user) throw new Error('Must be logged in');
+    if (!currentUser) throw new Error('Must be logged in');
     
     setLoading(true);
     try {
       const { data, error } = await supabase
         .from('creators')
         .insert({
-          id: user.id,
+          id: currentUser.id,
           company_name: companyName,
           description,
           website
@@ -156,7 +176,7 @@ export function useSupabaseData() {
 
   // Fetch user's purchased workflows
   const fetchPurchasedWorkflows = async (): Promise<(UserPurchaseRow & { workflow: WorkflowRow })[]> => {
-    if (!user) return [];
+    if (!currentUser) return [];
     
     setLoading(true);
     try {
@@ -166,7 +186,7 @@ export function useSupabaseData() {
           *,
           workflow:workflows(*)
         `)
-        .eq('user_id', user.id);
+        .eq('user_id', currentUser.id);
         
       if (error) throw error;
       return data as unknown as (UserPurchaseRow & { workflow: WorkflowRow })[];
@@ -185,7 +205,7 @@ export function useSupabaseData() {
 
   // Fetch user's projects (chats)
   const fetchUserProjects = async (): Promise<(ChatRow & { workflow: WorkflowRow })[]> => {
-    if (!user) return [];
+    if (!currentUser) return [];
     
     setLoading(true);
     try {
@@ -195,7 +215,7 @@ export function useSupabaseData() {
           *,
           workflow:workflows(*)
         `)
-        .eq('user_id', user.id)
+        .eq('user_id', currentUser.id)
         .order('updated_at', { ascending: false });
         
       if (error) throw error;
@@ -215,14 +235,14 @@ export function useSupabaseData() {
 
   // Create a new project
   const createProject = async (workflowId: string, projectName: string): Promise<ChatRow | null> => {
-    if (!user) throw new Error('Must be logged in');
+    if (!currentUser) throw new Error('Must be logged in');
     
     setLoading(true);
     try {
       const { data, error } = await supabase
         .from('chats')
         .insert({
-          user_id: user.id,
+          user_id: currentUser.id,
           workflow_id: workflowId,
           project_name: projectName
         })
@@ -250,9 +270,86 @@ export function useSupabaseData() {
     }
   };
 
+  // Create a user profile explicitly
+  const createProfile = async (firstName?: string, lastName?: string): Promise<ProfileRow | null> => {
+    if (!currentUser) {
+      console.log('No user found, cannot create profile');
+      throw new Error('Must be logged in to create a profile');
+    }
+    
+    setLoading(true);
+    try {
+      console.log('Creating profile for user ID:', currentUser.id);
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .insert({
+          id: currentUser.id,
+          first_name: firstName || currentUser.user_metadata?.first_name || null,
+          last_name: lastName || currentUser.user_metadata?.last_name || null
+        })
+        .select()
+        .single();
+        
+      if (error) {
+        console.error('Error creating profile:', error);
+        throw error;
+      }
+      
+      console.log('Profile created successfully:', data);
+      toast({
+        title: "Profile created",
+        description: "Your profile has been created successfully",
+      });
+      
+      return data as ProfileRow;
+    } catch (error) {
+      console.error('Error creating profile:', error);
+      toast({
+        title: "Error creating profile",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
+      });
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Helper function to ensure a user has a profile
+  const ensureUserProfile = async (): Promise<ProfileRow | null> => {
+    if (!currentUser) return null;
+    
+    try {
+      // First try to fetch the profile
+      const profile = await fetchProfile();
+      
+      // If profile exists, return it
+      if (profile) return profile;
+      
+      // If no profile, create one
+      console.log('No profile found, creating one');
+      return await createProfile(
+        currentUser.user_metadata?.first_name,
+        currentUser.user_metadata?.last_name
+      );
+    } catch (error) {
+      console.error('Error ensuring user profile:', error);
+      toast({
+        title: "Profile Error",
+        description: "There was an issue with your profile. Please try again later.",
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+  
   return {
     loading,
+    currentUser,
     fetchProfile,
+    createProfile,
+    ensureUserProfile,
     fetchCreatorProfile,
     registerAsCreator,
     fetchPurchasedWorkflows,
