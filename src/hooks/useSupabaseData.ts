@@ -57,30 +57,48 @@ export function useSupabaseData() {
       
       // Race the fetch against the timeout
       const profilePromise = (async () => {
+        // Don't use .single() which causes 406 errors when no profile exists
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', currentUser.id)
-          .single();
-          
+        console.log(data, error)
         if (error) {
           console.error('Error in fetchProfile query:', error);
-          
-          // If profile doesn't exist, just report the error
-          if (error.code === 'PGRST116') {
-            console.log('Profile not found for user:', currentUser.id);
-            throw new Error('Profile not found. Please contact support.');
-          }
-          
           throw error;
         }
         
-        console.log('Profile fetched successfully:', data);
-        return data as ProfileRow;
+        // Check if we got any results
+        if (!data || data.length === 0) {
+          console.log('Profile not found for user:', currentUser.id);
+          // Return null to indicate no profile was found, but don't throw an error
+          return null;
+        }
+        
+        console.log('Profile fetched successfully:', data[0]);
+        return data[0] as ProfileRow;
       })();
       
       // Race the profile fetch against the timeout
       const result = await Promise.race([profilePromise, timeoutPromise]);
+      
+      // If no profile was found, return a default profile structure
+      // This is our fallback mechanism
+      if (result === null) {
+        const defaultProfile: ProfileRow = {
+          id: currentUser.id,
+          first_name: currentUser.user_metadata?.first_name || null,
+          last_name: currentUser.user_metadata?.last_name || null,
+          avatar_url: null,
+          role: 'user', // Add default role
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        console.log('Returning default profile for user:', currentUser.id);
+        return defaultProfile;
+      }
+      
       return result;
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -90,8 +108,19 @@ export function useSupabaseData() {
         variant: "destructive",
       });
       
-      // Don't return a fallback profile - let the error propagate
-      return null;
+      // Return a fallback profile when there's an error
+      const fallbackProfile: ProfileRow = {
+        id: currentUser.id,
+        first_name: currentUser.user_metadata?.first_name || null,
+        last_name: currentUser.user_metadata?.last_name || null,
+        avatar_url: null,
+        role: 'user', // Add default role
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      console.log('Returning fallback profile due to error');
+      return fallbackProfile;
     } finally {
       setLoading(false);
     }

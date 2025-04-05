@@ -89,7 +89,7 @@ const Account = () => {
       console.log("Updating profile for user ID:", user.id);
       // Update profile using Supabase
       const { data, error } = await supabase
-        .from('profiles')
+        .from('users')
         .update({
           first_name: formData.firstName,
           last_name: formData.lastName,
